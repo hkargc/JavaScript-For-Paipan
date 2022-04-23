@@ -24,21 +24,21 @@ function paipan() {
      */
     this.MC = [];
 	/**
-	 * 缓存shuo moon朔望月
+	 * 缓存synodic month朔望月
 	 */
 	this.SM = [];
     /**
-     * 四柱是否区分 早晚子 时,true则23:00-24:00算成上一天
+     * 四柱是否区分"早晚子"时,true则23:00-24:00算成上一日柱
      */
     this.zwz = true;
+	/**
+     * 是否采用精确法"排大运",用于起运处,粗略法一年按360天算,精确法按回归年算
+     */
+    this.pdy = false;
     /**
      * 均值朔望月長 synodic month (new Moon to new Moon)
      */
     this.synmonth = 29.530588853;
-    /**
-     * 是否输出错误信息
-     */
-    this.debug = true;
     /**
      * 星期 week day
      */
@@ -101,7 +101,7 @@ function paipan() {
     /**
      * 类型
      */
-    this.lx = ['比劫', '印绶', '官杀', '才财', '食伤'];
+    this.lx = ['印绶', '比劫', '食伤', '才财', '官杀'];
     /**
      * 天干的五行屬性,01234分別代表:金水木火土
      */
@@ -1067,89 +1067,57 @@ function paipan() {
 		1920:{11:-1}
 	};
     this.qiKB = [ //气直线拟合参数 使农历-720年至2300年与寿星万年历匹配
-        1640650.479938, 15.21842500, // -221-11-09 h=0.01709 古历·秦汉
-        1642476.703182, 15.21874996, // -216-11-09 h=0.01557 古历·秦汉
-        1683430.515601, 15.218750011, // -104-12-25 h=0.01560 汉书·律历志(太初历)平气平朔 回归年=365.25000
-        1752157.640664, 15.218749978, //   85-02-23 h=0.01559 后汉书·律历志(四分历) 回归年=365.25000
-        1807675.003759, 15.218620279, //  237-02-22 h=0.00010 晋书·律历志(景初历) 回归年=365.24689
-        1883627.765182, 15.218612292, //  445-02-03 h=0.00026 宋书·律历志(何承天元嘉历) 回归年=365.24670
-        1907369.128100, 15.218449176, //  510-02-03 h=0.00027 宋书·律历志(祖冲之大明历) 回归年=365.24278
-        1936603.140413, 15.218425000, //  590-02-17 h=0.00149 随书·律历志(开皇历) 回归年=365.24220
-        1939145.524180, 15.218466998, //  597-02-03 h=0.00121 随书·律历志(大业历) 回归年=365.24321
-        1947180.798300, 15.218524844, //  619-02-03 h=0.00052 新唐书·历志(戊寅元历)平气定朔 回归年=365.24460
-        1964362.041824, 15.218533526, //  666-02-17 h=0.00059 新唐书·历志(麟德历) 回归年=365.24480
-        1987372.340971, 15.218513908, //  729-02-16 h=0.00096 新唐书·历志(大衍历,至德历) 回归年=365.24433
-        1999653.819126, 15.218530782, //  762-10-03 h=0.00093 新唐书·历志(五纪历) 回归年=365.24474
-        2007445.469786, 15.218535181, //  784-02-01 h=0.00059 新唐书·历志(正元历,观象历) 回归年=365.24484
-        2021324.917146, 15.218526248, //  822-02-01 h=0.00022 新唐书·历志(宣明历) 回归年=365.24463
-        2047257.232342, 15.218519654, //  893-01-31 h=0.00015 新唐书·历志(崇玄历) 回归年=365.24447
-        2070282.898213, 15.218425000, //  956-02-16 h=0.00149 旧五代·历志(钦天历) 回归年=365.24220
-        2073204.872850, 15.218515221, //  964-02-16 h=0.00166 宋史·律历志(应天历) 回归年=365.24437
-        2080144.500926, 15.218530782, //  983-02-16 h=0.00093 宋史·律历志(乾元历) 回归年=365.24474
-        2086703.688963, 15.218523776, // 1001-01-31 h=0.00067 宋史·律历志(仪天历,崇天历) 回归年=365.24457
-        2110033.182763, 15.218425000, // 1064-12-15 h=0.00669 宋史·律历志(明天历) 回归年=365.24220
-        2111190.300888, 15.218425000, // 1068-02-15 h=0.00149 宋史·律历志(崇天历) 回归年=365.24220
-        2113731.271005, 15.218515671, // 1075-01-30 h=0.00038 李锐补修(奉元历) 回归年=365.24438
-        2120670.840263, 15.218425000, // 1094-01-30 h=0.00149 宋史·律历志 回归年=365.24220
-        2123973.309063, 15.218425000, // 1103-02-14 h=0.00669 李锐补修(占天历) 回归年=365.24220
-        2125068.997336, 15.218477932, // 1106-02-14 h=0.00056 宋史·律历志(纪元历) 回归年=365.24347
-        2136026.312633, 15.218472436, // 1136-02-14 h=0.00088 宋史·律历志(统元历,乾道历,淳熙历) 回归年=365.24334
-        2156099.495538, 15.218425000, // 1191-01-29 h=0.00149 宋史·律历志(会元历) 回归年=365.24220
-        2159021.324663, 15.218425000, // 1199-01-29 h=0.00149 宋史·律历志(统天历) 回归年=365.24220
-        2162308.575254, 15.218461742, // 1208-01-30 h=0.00146 宋史·律历志(开禧历) 回归年=365.24308
-        2178485.706538, 15.218425000, // 1252-05-15 h=0.04606 淳祐历 回归年=365.24220
-        2178759.662849, 15.218445786, // 1253-02-13 h=0.00231 会天历 回归年=365.24270
-        2185334.020800, 15.218425000, // 1271-02-13 h=0.00520 宋史·律历志(成天历) 回归年=365.24220
-        2187525.481425, 15.218425000, // 1277-02-12 h=0.00520 本天历 回归年=365.24220
-        2188621.191481, 15.218437494, // 1280-02-13 h=0.00015 元史·历志(郭守敬授时历) 回归年=365.24250
-        2322147.76 // 1645-09-21
+        1640650.479938, 15.21842500, //-221-11-09 h=0.01709 古历·秦汉
+        1642476.703182, 15.21874996, //-216-11-09 h=0.01557 古历·秦汉
+        1683430.515601, 15.218750011, //-104-12-25 h=0.01560 汉书·律历志(太初历)平气平朔 回归年=365.25000
+        1752157.640664, 15.218749978, //85-02-23 h=0.01559 后汉书·律历志(四分历) 回归年=365.25000
+        1807675.003759, 15.218620279, //237-02-22 h=0.00010 晋书·律历志(景初历) 回归年=365.24689
+        1883627.765182, 15.218612292, //445-02-03 h=0.00026 宋书·律历志(何承天元嘉历) 回归年=365.24670
+        1907369.128100, 15.218449176, //510-02-03 h=0.00027 宋书·律历志(祖冲之大明历) 回归年=365.24278
+        1936603.140413, 15.218425000, //590-02-17 h=0.00149 随书·律历志(开皇历) 回归年=365.24220
+        1939145.524180, 15.218466998, //597-02-03 h=0.00121 随书·律历志(大业历) 回归年=365.24321
+        1947180.798300, 15.218524844, //619-02-03 h=0.00052 新唐书·历志(戊寅元历)平气定朔 回归年=365.24460
+        1964362.041824, 15.218533526, //666-02-17 h=0.00059 新唐书·历志(麟德历) 回归年=365.24480
+        1987372.340971, 15.218513908, //729-02-16 h=0.00096 新唐书·历志(大衍历,至德历) 回归年=365.24433
+        1999653.819126, 15.218530782, //762-10-03 h=0.00093 新唐书·历志(五纪历) 回归年=365.24474
+        2007445.469786, 15.218535181, //784-02-01 h=0.00059 新唐书·历志(正元历,观象历) 回归年=365.24484
+        2021324.917146, 15.218526248, //822-02-01 h=0.00022 新唐书·历志(宣明历) 回归年=365.24463
+        2047257.232342, 15.218519654, //893-01-31 h=0.00015 新唐书·历志(崇玄历) 回归年=365.24447
+        2070282.898213, 15.218425000, //956-02-16 h=0.00149 旧五代·历志(钦天历) 回归年=365.24220
+        2073204.872850, 15.218515221, //964-02-16 h=0.00166 宋史·律历志(应天历) 回归年=365.24437
+        2080144.500926, 15.218530782, //983-02-16 h=0.00093 宋史·律历志(乾元历) 回归年=365.24474
+        2086703.688963, 15.218523776, //1001-01-31 h=0.00067 宋史·律历志(仪天历,崇天历) 回归年=365.24457
+        2110033.182763, 15.218425000, //1064-12-15 h=0.00669 宋史·律历志(明天历) 回归年=365.24220
+        2111190.300888, 15.218425000, //1068-02-15 h=0.00149 宋史·律历志(崇天历) 回归年=365.24220
+        2113731.271005, 15.218515671, //1075-01-30 h=0.00038 李锐补修(奉元历) 回归年=365.24438
+        2120670.840263, 15.218425000, //1094-01-30 h=0.00149 宋史·律历志 回归年=365.24220
+        2123973.309063, 15.218425000, //1103-02-14 h=0.00669 李锐补修(占天历) 回归年=365.24220
+        2125068.997336, 15.218477932, //1106-02-14 h=0.00056 宋史·律历志(纪元历) 回归年=365.24347
+        2136026.312633, 15.218472436, //1136-02-14 h=0.00088 宋史·律历志(统元历,乾道历,淳熙历) 回归年=365.24334
+        2156099.495538, 15.218425000, //1191-01-29 h=0.00149 宋史·律历志(会元历) 回归年=365.24220
+        2159021.324663, 15.218425000, //1199-01-29 h=0.00149 宋史·律历志(统天历) 回归年=365.24220
+        2162308.575254, 15.218461742, //1208-01-30 h=0.00146 宋史·律历志(开禧历) 回归年=365.24308
+        2178485.706538, 15.218425000, //1252-05-15 h=0.04606 淳祐历 回归年=365.24220
+        2178759.662849, 15.218445786, //1253-02-13 h=0.00231 会天历 回归年=365.24270
+        2185334.020800, 15.218425000, //1271-02-13 h=0.00520 宋史·律历志(成天历) 回归年=365.24220
+        2187525.481425, 15.218425000, //1277-02-12 h=0.00520 本天历 回归年=365.24220
+        2188621.191481, 15.218437494, //1280-02-13 h=0.00015 元史·历志(郭守敬授时历) 回归年=365.24250
+        2322147.76 //1645-09-21
     ];
 	this.suoKB = [ //朔直线拟合参数 使农历-720年至2300年与寿星万年历匹配
-        1457698.231017, 29.53067166, // -721-12-17 h=0.00032 古历·春秋
-        1546082.512234, 29.53085106, // -479-12-11 h=0.00053 古历·战国
-        1640640.735300, 29.53060000, // -221-10-31 h=0.01010 古历·秦汉
-        1642472.151543, 29.53085439, // -216-11-04 h=0.00040 古历·秦汉
-        1683430.509300, 29.53086148, // -104-12-25 h=0.00313 汉书·律历志(太初历)平气平朔
-        1752148.041079, 29.53085097, //   85-02-13 h=0.00049 后汉书·律历志(四分历)
-        1807724.481520, 29.53059851, //  237-04-12 h=0.00033 晋书·律历志(景初历)
-        1883618.114100, 29.53060000, //  445-01-24 h=0.00030 宋书·律历志(何承天元嘉历)
-        1907360.704700, 29.53060000, //  510-01-26 h=0.00030 宋书·律历志(祖冲之大明历)
-        1936596.224900, 29.53060000, //  590-02-10 h=0.01010 随书·律历志(开皇历)
-        1939135.675300, 29.53060000, //  597-01-24 h=0.00890 随书·律历志(大业历)
-        1947168.00 //  619-01-21
+        1457698.231017, 29.53067166, //-721-12-17 h=0.00032 古历·春秋
+        1546082.512234, 29.53085106, //-479-12-11 h=0.00053 古历·战国
+        1640640.735300, 29.53060000, //-221-10-31 h=0.01010 古历·秦汉
+        1642472.151543, 29.53085439, //-216-11-04 h=0.00040 古历·秦汉
+        1683430.509300, 29.53086148, //-104-12-25 h=0.00313 汉书·律历志(太初历)平气平朔
+        1752148.041079, 29.53085097, //85-02-13 h=0.00049 后汉书·律历志(四分历)
+        1807724.481520, 29.53059851, //237-04-12 h=0.00033 晋书·律历志(景初历)
+        1883618.114100, 29.53060000, //445-01-24 h=0.00030 宋书·律历志(何承天元嘉历)
+        1907360.704700, 29.53060000, //510-01-26 h=0.00030 宋书·律历志(祖冲之大明历)
+        1936596.224900, 29.53060000, //590-02-10 h=0.01010 随书·律历志(开皇历)
+        1939135.675300, 29.53060000, //597-01-24 h=0.00890 随书·律历志(大业历)
+        1947168.00 //619-01-21
     ];
-    /**
-     * 记录日志
-     * @var string s
-     */
-    this.logs = function(n, s) {
-        var m = [];
-        m[0] = "超出计算能力";
-        m[1] = "适用于西元-1000年至西元3000年,超出此范围误差较大";
-        m[2] = "对应的干支不存在";
-        m[3] = "干支非六十甲子";
-        m[4] = "日期超出范围";
-        m[5] = "日期错误";
-        m[6] = "月份错误";
-        m[7] = "此年非闰年";
-        m[8] = "此月非闰月";
-        m[9] = "不存在的时间";
-        m[10] = "参数非整数字符串";
-        m[11] = "参数非整数类型";
-        m[12] = "参数非浮点类型";
-        m[13] = "月份超出范围";
-        m[14] = "此年无闰月";
-        m[15] = "参数非整数";
-        m[16] = "参数非数字";
-        if (this.debug) {
-            var ss = "Msg:"
-			ss += (m[n] === undefined) ? n : m[n];
-            ss += (s === undefined) ? "" : (":" + s);
-
-            console.log(ss);
-        }
-        return false;
-    };
     /**
      * 来源: https://locutus.io/php/
      */
@@ -1167,14 +1135,12 @@ function paipan() {
             }
             tmp = parseInt(mixedVar, base || 10);
             if (isNaN(tmp) || !isFinite(tmp)) {
-                this.logs(15, tmp);
                 return 0;
             }
             return tmp;
         } else if (type === 'number' && isFinite(mixedVar)) {
             return mixedVar < 0 ? Math.ceil(mixedVar) : Math.floor(mixedVar);
         } else {
-            this.logs(15, mixedVar);
             return 0;
         }
     };
@@ -1182,11 +1148,7 @@ function paipan() {
      * 来源: https://locutus.io/php/
      */
     this.floatval = function(mixedVar) {
-        var tmp = parseFloat(mixedVar);
-        if (isNaN(tmp)) {
-            this.logs(16, mixedVar);
-        }
-        return (tmp || 0);
+        return (parseFloat(mixedVar) || 0);
     };
     /**
      * 来源: https://locutus.io/php/
@@ -1210,16 +1172,16 @@ function paipan() {
         return true;
     };
 	/**
-	 * 真太阳时模块,cn代表cosine
-	 */
-	this.cn = function(x) {
-		return Math.cos(x * 1.74532925199433E-02);
-	};
-	/**
 	 * 真太阳时模块,sn代表sin
 	 */
 	this.sn = function(x) {
 		return Math.sin(x * 1.74532925199433E-02);
+	};
+	/**
+	 * 真太阳时模块,cn代表cosine
+	 */
+	this.cn = function(x) {
+		return Math.cos(x * 1.74532925199433E-02);
 	};
 	/**
 	 * 真太阳时模块,返回小数部分(负数特殊) returns fractional part of a number
@@ -1235,7 +1197,7 @@ function paipan() {
 	 * 真太阳时模块,只取整数部份
 	 */
 	this.ipart = function(x) {
-		if(x == 0){
+		if (x == 0) {
 			return 0;
 		}
 		return (x / Math.abs(x)) * Math.floor(Math.abs(x));
@@ -1268,18 +1230,44 @@ function paipan() {
 		return [xe, ye, z1, z2, nz];
 	};
 	/**
-	 * 真太阳时模块,returns sine of the altitude of either the sun or the moon given the modified julian day number at midnight UT and the hour of the UT day
+	 * 真太阳时模块,returns sine of the altitude of either the sun or the moon given the modified julian day of the UT
+	 * @param float jd
+	 * @param float J 经度,东经为正西经为负
+	 * @param float W
+	 * @param int LX 1月亮 2太阳日升日落 3太阳海上微光
 	 */
-	this.sinalt = function(instant, J, W) {
-		var t = (instant - 51544.5) / 36525; //sun: Returns RA and DEC of Sun to roughly 1 arcmin for few hundred years either side of J2000.0
+	this.sinalt = function(jd, J, W, LX) {
+		var instant = jd - 2400001;
+		
+		var t = (instant - 51544.5) / 36525; //减51544.5为相对2000年01月01日零点
+		if (LX == 1) {
+			var [ra, dec] = this.moon(t);
+		} else {
+			var [ra, dec] = this.sun(t);
+		}
+
+		var mjd0 = this.ipart(instant); //UT时间0点;returns the local sidereal time(计算观测地区的恒星时)开始
+		var ut = (instant - mjd0) * 24;
+		var t2 = (mjd0 - 51544.5) / 36525;
+		var gmst = 6.697374558 + 1.0027379093 * ut;
+		gmst = gmst + (8640184.812866 + (0.093104 - 0.0000062 * t2) * t2) * t2 / 3600;
+		var lmst = 24 * this.fpart((gmst + J / 15) / 24); //结束
+
+		var tau = 15 * (lmst - ra); //hour angle of object
+		return this.sn(W) * this.sn(dec) + this.cn(W) * this.cn(dec) * this.cn(tau);
+	};
+	/**
+	 * 真太阳时模块,关于太阳的,Returns RA and DEC of Sun to roughly 1 arcmin for few hundred years either side of J2000.0
+	 */
+	this.sun = function(t) {
 		var p2 = 2 * Math.PI;
 		var COSEPS = 0.91748;
 		var SINEPS = 0.39778;
 		var m = p2 * this.fpart(0.993133 + 99.997361 * t); //Mean anomaly
 		var dL = 6893 * Math.sin(m) + 72 * Math.sin(2 * m); //Eq centre
 		var L = p2 * this.fpart(0.7859453 + m / p2 + (6191.2 * t + dL) / 1296000);
-		
-		var sl = Math.sin(L); //convert to RA and DEC - ecliptic latitude of Sun taken as zero
+		//convert to RA and DEC - ecliptic latitude of Sun taken as zero
+		var sl = Math.sin(L);
 		var x = Math.cos(L);
 		var y = COSEPS * sl;
 		var Z = SINEPS * sl;
@@ -1289,57 +1277,105 @@ function paipan() {
 		if (ra < 0) {
 			ra = ra + 24;
 		}
-		
-		var mjd = this.ipart(instant); //lmst: returns the local siderial time for the instant and longitude specified
-		var ut = (instant - mjd) * 24;
-		var t2 = (mjd - 51544.5) / 36525;
-		var gmst = 6.697374558 + 1.0027379093 * ut;
-		gmst = gmst + (8640184.812866 + (0.093104 - 0.0000062 * t2) * t2) * t2 / 3600;
-		var lmst = 24 * this.fpart((gmst - J / 15) / 24); //取得观测地区的恒星时
-		var tau = 15 * (lmst - ra); //hour angle of object
-		var sinho = this.sn(-50 / 60); //sunrise - classic value for refraction
-		return this.sn(W) * this.sn(dec) + this.cn(W) * this.cn(dec) * this.cn(tau) - sinho;
+		return [ra, dec];
 	};
 	/**
-	 * 真太阳时模块,改编自 https://bieyu.com/ (月亮與太陽出没時間) 原理:用天文方法计算出太阳升起和落下时刻,中间则为当地正午(自创),与12点比较得到时差;与寿星万年历比较,两者相差在20秒内
-	 * @param float jd
-	 * @param float J 经度
-	 * @param float W 纬度,太阳并不是严格从正东方升起,所以纬度也有影响,只是相对影响较小
+	 * 真太阳时模块,关于月球的,Returns RA and DEC of Moon to 5 arc min (ra) and 1 arc min (dec) for a few centuries either side of J2000.0
+	 * Predicts rise and set times to within minutes for about 500 years in past - TDT and UT time diference may become significant for long times
 	 */
-	this.zty = function(jd, J, W) {
+	this.moon = function(t) {
+		var p2 = 2 * Math.PI;
+		var ARC = 206264.8062;
+		var COSEPS = 0.91748;
+		var SINEPS = 0.39778;
+		var L0 = this.fpart(0.606433 + 1336.855225 * t); //mean long Moon in revs
+		var L = p2 * this.fpart(0.374897 + 1325.55241 * t); //mean anomaly of Moon
+		var LS = p2 * this.fpart(0.993133 + 99.997361 * t); //mean anomaly of Sun
+		var d = p2 * this.fpart(0.827361 + 1236.853086 * t); //diff longitude sun and moon
+		var F = p2 * this.fpart(0.259086 + 1342.227825 * t); //mean arg latitude
+		//longitude correction terms
+		var dL = 22640 * Math.sin(L) - 4586 * Math.sin(L - 2 * d);
+		dL = dL + 2370 * Math.sin(2 * d) + 769 * Math.sin(2 * L);
+		dL = dL - 668 * Math.sin(LS) - 412 * Math.sin(2 * F);
+		dL = dL - 212 * Math.sin(2 * L - 2 * d) - 206 * Math.sin(L + LS - 2 * d);
+		dL = dL + 192 * Math.sin(L + 2 * d) - 165 * Math.sin(LS - 2 * d);
+		dL = dL - 125 * Math.sin(d) - 110 * Math.sin(L + LS);
+		dL = dL + 148 * Math.sin(L - LS) - 55 * Math.sin(2 * F - 2 * d);
+		//latitude arguments
+		var S = F + (dL + 412 * Math.sin(2 * F) + 541 * Math.sin(LS)) / ARC;
+		var h = F - 2 * d;
+		//latitude correction terms
+		var N = -526 * Math.sin(h) + 44 * Math.sin(L + h) - 31 * Math.sin(h - L) - 23 * Math.sin(LS + h);
+		var N = N + 11 * Math.sin(h - LS) - 25 * Math.sin(F - 2 * L) + 21 * Math.sin(F - L);
+		var lmoon = p2 * this.fpart(L0 + dL / 1296000); //Lat in rads
+		var bmoon = (18520 * Math.sin(S) + N) / ARC; //long in rads
+		//convert to equatorial coords using a fixed ecliptic
+		var CB = Math.cos(bmoon);
+		var x = CB * Math.cos(lmoon);
+		var V = CB * Math.sin(lmoon);
+		var C = Math.sin(bmoon);
+		var y = COSEPS * V - SINEPS * C;
+		var Z = SINEPS * V + COSEPS * C;
+		var rho = Math.sqrt(1 - Z * Z);
+		var dec = (360 / p2) * Math.atan(Z / rho); //算出月球的视赤纬(apparent declination)
+		var ra = (48 / p2) * Math.atan(y / (x + rho)); //算出月球的视赤经(apparent right ascension)
+		if (ra < 0) {
+			ra = ra + 24;
+		}
+		return [ra, dec];
+	};
+	/**
+	 * 真太阳时模块,rise and set(升降计算) [升起时刻(真太阳时),落下时刻(真太阳时),真平太阳时差(仅类型2),升起时刻(标准时间,仅类型2),落下时刻(标准时间,仅类型2)]
+	 * @param float jd
+	 * @param float J 经度,东经为正西经为负
+	 * @param float W
+	 * @param int LX 类型:1月亮;2太阳日升日落;3太阳海上微光
+	 * @return array
+	 */
+	this.risenset = function(jd, J, W, LX) {
 		var jd = this.floatval(jd);
-		var J = (J === undefined) ? -1 * this.J : -1 * this.floatval(J); //此模块西经为正 routines use east longitude negative convention
-		var W = (W === undefined) ? +1 * this.W : +1 * this.floatval(W); //北纬为正,南纬为负
+		var J = +1 * this.floatval(J); //统一东经为正
+		var W = +1 * this.floatval(W); //北纬为正,南纬为负
 		
-		var thedate = Math.round(jd) - 2400001 - this.J / 360; //儒略日中午12点,減去2400001再減去8小時時差,再减51544.5为2000年01月01日零点
+		var noon = Math.round(jd) - this.J / 360; //儒略日,中午12点,減去8小時時差
+
+		var sinho = new Array(3); //太阳盘面几何中心与理想地平面之间的夹角
+		sinho[1] = this.sn(8 / 60); //moonrise - average diameter used(月亮升降)
+		sinho[2] = this.sn(-50 / 60); //sunrise - classic value for refraction(太阳升降)
+		sinho[3] = this.sn(-12); //nautical twilight(海上微光)
 		
 		var rise = 0; //是否有升起动作
-		var utrise = 0; //升起的时间
+		var utrise = false; //升起的时间
 		
 		var sett = 0; //是否有落下动作
-		var utset = 0; //落下的时间
+		var utset = false; //落下的时间
 
-		var hour = 1; //起始时间
+		var hour = 1;
 		var zero2 = 0; //两小时内是否进行了升起和落下两个动作(极地附近有这种情况,如1999年12月25日,经度0,纬度67.43,当天的太阳只有8分钟-_-)
-		
-		var ym = this.sinalt(thedate + (hour - 1) / 24, J, W); //See STEP 1 and 2 of Web page description.
-		var above = (ym > 0) ? 1 : 0; //used later to classify non-risings 是否在地平线上方
-		
-		do { //STEP 1 and STEP 3 of Web page description
-			var y0 = this.sinalt(thedate + (hour + 0) / 24, J, W);
-			var yp = this.sinalt(thedate + (hour + 1) / 24, J, W);
-			
-			var [xe, ye, z1, z2, nz] = this.quad(ym, y0, yp); //STEP 4 of web page description 大概是三点确定一条抛物线?
+
+		var ym = this.sinalt(noon + (hour - 1)/24, J, W, LX) - sinho[LX]; //See STEP 1 and 2 of Web page description.
+		if (ym > 0) { //used later to classify non-risings 是否在地平线上方,用于判断极昼极夜
+			var above = 1;
+		} else {
+			var above = 0;
+		}
+
+		do {
+			//STEP 1 and STEP 3 of Web page description
+			var y0 = this.sinalt(noon + (hour + 0)/24, J, W, LX) - sinho[LX];
+			var yp = this.sinalt(noon + (hour + 1)/24, J, W, LX) - sinho[LX];
+			//STEP 4 of web page description
+			var [xe, ye, z1, z2, nz] = this.quad(ym, y0, yp);
 			switch (nz) { //cases depend on values of discriminant - inner part of STEP 4
 				case 0: //nothing  - go to next time slot
 				break; 
 				case 1: //simple rise / set event
 					if (ym < 0) { //must be a rising event
-						rise = 1;
 						utrise = hour + z1;
+						rise = 1;
 					} else { //must be setting
-						sett = 1;
 						utset = hour + z1;
+						sett = 1;
 					}
 				break;
 				case 2: //rises and sets within interval
@@ -1357,24 +1393,53 @@ function paipan() {
 			}
 			ym = yp; //reuse the ordinate in the next interval
 			hour = hour + 2;
-		} while ((hour < 25) && (rise * sett == 0)); //STEP 5 of Web page description - have we finished for this object?
-		if(rise * sett == 0){ //极昼极夜存在此种情况(above==1极昼,above==0极夜)
-			return jd;
+		} while (!((hour == 25) || (rise * sett == 1))); //STEP 5 of Web page description - have we finished for this object?
+		
+		if(utset !== false){ //注意这里转成了真太阳时
+			utset = Math.round(jd) - 0.5 + utset/24 - (this.J - J) * 4 / 60 / 24;
 		}
-		while(utset < utrise){ //太阳先升起再落下,时区与经度不匹配的情况下会出现此种情况
-			utset += 24;
+		if(utrise !== false){
+			utrise = Math.round(jd) - 0.5 + utrise/24 - (this.J - J) * 4 / 60 / 24;
 		}
-		var noon = utrise + (utset - utrise) / 2; //太阳升起和落下时刻,中点则为当地正午
-		return jd - (noon - 12) / 24; //与12点比较得到时差,单位由小时转为天
+
+		var dt = 0; //地方平太阳时 减 真太阳时 的差值,即"真平太阳时差换算表",单位为天
+		var tset = (LX == 2) ? utset : 0; //用于返回标准时间,关于月亮的必须先通过太阳升降获取到dt再转标准时间
+		var trise = (LX == 2) ? utrise : 0;
+		if((LX == 2) && (rise * sett == 1)){ //太阳相关,非极昼极夜且有升有落
+			while(tset < trise){ //太阳先落下再升起,时区与经度不匹配的情况下会出现此种情况,加一天修正
+				tset += 1;
+			}
+			dt = Math.round(jd) - (trise + (tset - trise) / 2); //单位为天.比较两者的中午12点(上午和下午是对称的)
+			
+			tset = tset - dt + (this.J - J) * 4 / 60 / 24; //真太阳时转标准时间
+			trise = trise - dt + (this.J - J) * 4 / 60 / 24;
+		}
+
+		return [utrise, utset, dt, trise, tset];
+	};
+	/**
+	 * 真太阳时模块,改编自 https://bieyu.com/ (月亮與太陽出没時間) 原理:用天文方法计算出太阳升起和落下时刻,中间则为当地正午(自创),与12点比较得到时差;与寿星万年历比较,两者相差在20秒内
+	 * @param float jd
+	 * @param float J 经度,东经为正西经为负,注意西经60度38分转换方式是: -60 + -1 * 38/60
+	 * @param float W 纬度,北纬为正南纬为负,太阳并不是严格从正东方升起,所以纬度也有影响,只是相对影响较小
+	 */
+	this.zty = function(jd, J, W) {
+		var jd = this.floatval(jd);
+		var J = (J === undefined) ? this.J : this.floatval(J);
+		var W = (W === undefined) ? this.W : this.floatval(W);
+		
+		var [utrise, utset, dt, trise, tset] = this.risenset(jd, J, W, 2);
+		
+		return jd - (this.J - J) * 4 / 60 / 24 + dt; //转地方平太阳时+修正
 	};
     /**
      * 將公历時间轉换爲儒略日
-     * @param int yy
-     * @param int mm
-     * @param int dd
-     * @param int hh
-     * @param int mt
-     * @param int ss
+     * @param int yy(-1000-3000)
+     * @param int mm(1-12)
+     * @param int dd(1-31)
+     * @param int hh(0-23)
+     * @param int mt(0-59)
+     * @param int ss(0-59)
      * @return false|number
      */
     this.Jdays = function(yy, mm, dd, hh, mt, ss) {
@@ -1384,10 +1449,7 @@ function paipan() {
         var hh = (hh === undefined) ? 12 : this.floatval(hh);
         var mt = (mt === undefined) ? 0 : this.floatval(mt);
         var ss = (ss === undefined) ? 0 : this.floatval(ss);
-        if (yy < -7000 || yy > 7000) { //超出計算能力
-            this.logs(0);
-            return false;
-        }
+
         var yp = yy + Math.floor((mm - 3) / 10);
         if ((yy > 1582) || (yy == 1582 && mm > 10) || (yy == 1582 && mm == 10 && dd >= 15)) {
             var init = 1721119.5;
@@ -1397,7 +1459,6 @@ function paipan() {
                 var init = 1721117.5;
                 var jdy = Math.floor(yp * 365.25);
             } else { //不存在的时间
-                this.logs(9);
                 return false;
             }
         }
@@ -1409,9 +1470,9 @@ function paipan() {
         return jdy + jdm + jdd + jdh + init;
     };
     /**
-     * 將儒略日轉换爲公历(即陽曆或格里曆)年月日時分秒
+     * 將儒略日轉换爲公历(即陽曆或格里曆)年月日時分秒 [年,月,日,时,分,秒]
      * @param float jd
-     * @return array(年,月,日,时,分,秒)
+     * @return array
      */
     this.Jtime = function(jd) {
         var jd = this.floatval(jd);
@@ -1450,15 +1511,14 @@ function paipan() {
     };
     /**
      * 驗證公历日期是否有效
-     * @param int yy
-     * @param int mm
-     * @param int dd
+     * @param int yy(-1000-3000)
+     * @param int mm(1-12)
+     * @param int dd(1-31)
      * @return boolean
      */
     this.ValidDate = function(yy, mm, dd) {
         var vd = true;
         if (mm <= 0 || mm > 12) { //月份超出範圍
-            this.logs(13);
             vd = false;
         } else {
             var ndf1 = -(yy % 4 == 0); //可被四整除
@@ -1467,15 +1527,14 @@ function paipan() {
             var dom = 30 + ((Math.abs(mm - 7.5) + 0.5) % 2) - (mm == 2) * (2 + ndf);
             if (dd <= 0 || dd > dom) {
                 if (ndf == 0 && mm == 2 && dd == 29) { //此年無閏月
-                    this.logs(14);
+                   
                 } else { //日期超出範圍
-                    this.logs(4);
+
                 }
                 vd = false;
             }
         }
         if (yy == 1582 && mm == 10 && dd >= 5 && dd < 15) { //此日期不存在
-            this.logs(9);
             vd = false;
         }
         return vd;
@@ -1496,7 +1555,6 @@ function paipan() {
                 var m = yx / 1000;
                 var jdve = 1721139.29189 + 365242.1374 * m + 0.06134 * m * m + 0.00111 * m * m * m - 0.00071 * m * m * m * m;
             } else { //超出计算能力范围
-                this.logs(0);
                 return false;
             }
         }
@@ -1658,8 +1716,8 @@ function paipan() {
         return dt / 60; //將秒轉換為分
     };
     /**
-     * 获取指定公历年對Perturbaton作調整後的自春分點開始的24節氣,1645年启用传教士汤若望引进的时宪历,与现代天文算法存在误差,此处依据寿星万年历进行修正
-     * @param int yy
+     * 获取指定公历年對Perturbaton作調整後的自春分點開始的24節氣,1645年农历七月及之前为<授时历>,八月开始启用传教士汤若望的<时宪历>,与现代天文算法存在误差,此处依据寿星万年历进行修正
+     * @param int yy(-1000-3000)
 	 * @param bool calendar 是否根据黄历进行调整,调整后精度为日(仅用于农历计算)
      * @return array this.jq[i%24]
      */
@@ -1710,7 +1768,7 @@ function paipan() {
 					jdjq[j] = B[i] + B[i + 1] * Math.floor((jdjq[j] + pc - B[i]) / B[i + 1]);
 					jdjq[j] = Math.floor(jdjq[j] + 0.5);
 					if (jdjq[j] == 1683460) {
-						jdjq[j]++; //如果使用太初历计算-103年1月24日的朔日,结果得到的是23日,这里修正为24日(实历)。修正后仍不影响-103的无中置闰。如果使用秦汉历,得到的是24日,本行D不会被执行。
+						jdjq[j]++; //如果使用太初历计算-103年1月24日的朔日,结果得到的是23日,这里修正为24日(实历).修正后仍不影响-103的无中置闰.如果使用秦汉历,得到的是24日,本行D不会被执行.
 					}
 				}
 			}
@@ -1726,21 +1784,25 @@ function paipan() {
 		return jdjq;
     };
     /**
-     * 對於指定日期時刻所屬的朔望月,求出其均值新月點的月序數
+     * 對於指定日期時刻所屬的朔望月,求出其均值新月點的月序數或时刻
      * @param float jd
-     * @return int
+	 * @param bool return_k 是否仅返回月序数
+     * @return int/float
      */
-    this.MeanNewMoon = function(jd) {
+    this.MeanNewMoon = function(jd, return_k) {
         var jd = this.floatval(jd);
 
         //k為從2000年1月6日14時20分36秒起至指定年月日之陰曆月數,以synodic month為單位
-        var k = Math.floor((jd - 2451550.09765) / this.synmonth); //2451550.09765為2000年1月6日14時20分36秒之JD值。
-        //var jdt = 2451550.09765 + k * this.synmonth;
+        var k = Math.floor((jd - 2451550.09765) / this.synmonth); //2451550.09765為2000年1月6日14時20分36秒之JD值,此為2000年後的第一個均值新月
+		if(return_k){
+			return k;
+		}
+        var jdt = 2451550.09765 + k * this.synmonth;
         //Time in Julian centuries from 2000 January 0.5.
-        //var t = (jdt - 2451545) / 36525; //以100年為單位,以2000年1月1日12時為0點
-        //var thejd = jdt + 0.0001337 * t * t - 0.00000015 * t * t * t + 0.00000000073 * t * t * t * t;
-        //2451550.09765為2000年1月6日14時20分36秒,此為2000年後的第一個均值新月
-        return k;
+        var t = (jdt - 2451545) / 36525; //以100年為單位,以2000年1月1日12時為0點
+        var pt = jdt + 0.0001337 * t * t - 0.00000015 * t * t * t + 0.00000000073 * t * t * t * t; //mean time of phase
+
+        return pt;
     };
     /**
      * 求出實際新月點.以2000年初的第一個均值新月點為0點求出的均值新月點和其朔望月之序數k代入此副程式來求算實際新月點
@@ -1767,14 +1829,14 @@ function paipan() {
 				var jdt = B[i] + B[i + 1] * Math.floor((jd + pc - B[i]) / B[i + 1]);
 				jdt = Math.floor(jdt + 0.5);
 				if (jdt == 1683460) {
-					jdt++; //如果使用太初历计算-103年1月24日的朔日,结果得到的是23日,这里修正为24日(实历)。修正后仍不影响-103的无中置闰。如果使用秦汉历,得到的是24日,本行D不会被执行。
+					jdt++; //如果使用太初历计算-103年1月24日的朔日,结果得到的是23日,这里修正为24日(实历).修正后仍不影响-103的无中置闰.如果使用秦汉历,得到的是24日,本行D不会被执行.
 				}	
 				
 				return jdt;
 			}
 		}
 		
-		var k = this.MeanNewMoon(jd); //+ 0,0.25,0.5,0.75分別對應新月,上弦月,滿月,下弦月
+		var k = this.MeanNewMoon(jd, true); //+ 0,0.25,0.5,0.75分別對應新月,上弦月,滿月,下弦月
         var jdt = 2451550.09765 + k * this.synmonth;
         var t = (jdt - 2451545) / 36525; //2451545為2000年1月1日正午12時的JD
         var t2 = t * t; //square for frequent use
@@ -1792,7 +1854,7 @@ function paipan() {
         var omega = 124.7746 - 1.5637558 * k + 0.0020691 * t2 + 0.00000215 * t3;
         //乘式因子
         var es = 1 - 0.002516 * t - 0.0000074 * t2;
-        //因perturbation造成的偏移：
+        //因perturbation造成的偏移
         var apt1 = -0.4072 * Math.sin((Math.PI / 180) * mprime);
         apt1 += 0.17241 * es * Math.sin((Math.PI / 180) * m);
         apt1 += 0.01608 * Math.sin((Math.PI / 180) * 2 * mprime);
@@ -1841,8 +1903,8 @@ function paipan() {
 		
 		if(calendar && this.smXFu[yy]){ //下面进行查表修正
 			var jd = this.Jdays(yy, 1, 1, 0, 0, 0); //算<=当年的那个朔望日
-			var j = this.MeanNewMoon(jd);
-			var n = Math.floor(k) - j; //当年第几个朔望日,用作校准的下标
+			var k2 = this.MeanNewMoon(jd, true);
+			var n = k - k2; //当年第几个朔望日,用作校准的下标
 			if(this.smXFu[yy][n]){
 				jdt += this.smXFu[yy][n];
 				jdt = Math.floor(jdt + 0.5); //修正后精度为日
@@ -1852,9 +1914,9 @@ function paipan() {
 		return jdt;
     };
     /**
-     * 以比較日期法求算冬月及其餘各月名稱代碼,包含閏月,冬月為0,臘月為1,正月為2,餘類推。閏月多加0.5
-     * @param int yy
-	 * @return array(各月名稱, 含冬至連續16個新月點)
+     * 以比較日期法求算冬月及其餘各月名稱代碼,包含閏月,冬月為0,臘月為1,正月為2,餘類推.閏月多加0.5 [各月名稱, 含冬至連續16個新月點]
+     * @param int yy(-1000-3000)
+	 * @return array
      */
     this.GetZQandSMandLunarMonthCode = function(yy) {
         var yy = this.intval(yy);
@@ -1903,7 +1965,7 @@ function paipan() {
                 mc[i] = i;
             }
             for (var i = 13; i <= 14; i++) { //處理次一置月年的11月與12月,亦有可能含閏月
-                //若次一陰曆臘月起始日大於附近的冬至中氣日,且陰曆正月起始日小於或等於大寒中氣日,則此月為閏月,次一正月同理。
+                //若次一陰曆臘月起始日大於附近的冬至中氣日,且陰曆正月起始日小於或等於大寒中氣日,則此月為閏月,次一正月同理.
                 if (Math.floor((sjd[i] + 0.5) > Math.floor(qjd[i - 1 - yz] + 0.5) && Math.floor(sjd[i + 1] + 0.5) <= Math.floor(qjd[i - yz] + 0.5))) {
                     mc[i] = i - 0.5;
                     yz = 1; //標示遇到閏月
@@ -1919,32 +1981,23 @@ function paipan() {
         return [mc, sjd];
     };
     /**
-     * 将农历时间转换成公历时间
-     * @param int yy
-     * @param int mm
-     * @param int dd
+     * 将农历时间转换成公历时间 [年,月,日,附加资料]
+     * @param int yy(-1000-3000)
+     * @param int mm(1-12)
+     * @param int dd(1-30)
      * @param boolean ry 是否闰月
-     * @return false/array(年,月,日,附加资料)
+     * @return false/array
      */
     this.Lunar2Solar = function(yy, mm, dd, ry) { //此為將陰曆日期轉換為陽曆日期的主程式
         var yy = this.intval(yy);
         var mm = this.intval(mm);
         var dd = this.intval(dd);
         var ry = this.boolval(ry);
-		
-		if (yy < -1000 || yy > 3000) { //適用於西元-1000年至西元3000年,超出此範圍誤差較大
-            this.logs(1);
-        }
-        if (yy < -7000 || yy > 7000) { //超出計算能力
-            this.logs(0);
-            return false;
-        }
+
 		if(mm < 1 || mm > 12){ //月份錯誤
-			this.logs(6);
 			return false;
 		}
 		if(dd < 1 || dd > 30){ //日期錯誤
-			this.logs(5);
 			return false;
 		}
 		var ob = { //返回附加资料
@@ -1955,7 +2008,7 @@ function paipan() {
         var runyue = 0; //若閏月旗標為0代表無閏月
         for (var j = 1; j <= 14; j++) { //確認指定年前一年11月開始各月是否閏月
             if (mc[j] - Math.floor(mc[j]) > 0) { //若是,則將此閏月代碼放入閏月旗標內
-                runyue = Math.floor(mc[j] + 0.5); //runyue=0對應陰曆11月,1對應陰曆12月,2對應陰曆隔年1月,依此類推。
+                runyue = Math.floor(mc[j] + 0.5); //runyue=0對應陰曆11月,1對應陰曆12月,2對應陰曆隔年1月,依此類推.
 				if(runyue >= 3){
 					ob.leap = runyue - 2;
 				}
@@ -2011,7 +2064,6 @@ function paipan() {
 			}
 		}
 		if(er > 0){
-			this.logs(er);
 			return false;
 		}
 		var [yi, mi, dz] = this.Jtime(jdx);
@@ -2019,59 +2071,58 @@ function paipan() {
         return [yi, mi, dz, ob];
     };
     /**
-     * 将公历时间转换成农历时间(古代历法来自寿星万年历)
-     * @param int yy
-     * @param int mm
-     * @param int dd
-     * @return false/array(年,月,日,是否闰月,附加资料)
+     * 将公历时间转换成农历时间(古代历法来自寿星万年历) [年,月,日,是否闰月,附加资料]
+     * @param int yy(-1000-3000)
+     * @param int mm(1-12)
+     * @param int dd(1-31)
+     * @return false/array
      */
     this.Solar2Lunar = function(yy, mm, dd) {
         var yy = this.intval(yy);
         var mm = this.intval(mm);
         var dd = this.intval(dd);
 
-        //限定範圍
-        if (yy < -7000 || yy > 7000) { //超出計算能力
-            this.logs(0);
-            return false;
-        }
-        if (yy < -1000 || yy > 3000) { //適用於西元-1000年至西元3000年,超出此範圍誤差較大
-            this.logs(1);
-        }
         //驗證輸入日期的正確性,若不正確則跳離
         if (this.ValidDate(yy, mm, dd) === false) {
             return false;
         }
 		var ob = { //返回附加资料,古代农历要用到
 			'ym':'', //月建别名yue ming
-			'yi':0 //正月初一定年份,所以改了月建要相应改年份,不具备唯一性仅供展示,要逆转到公历必须用返回中的[yi, mi, dz, ry]
+			'yi':0, //正月初一定年份,所以改了月建要相应改年份,不具备唯一性仅供展示,要逆转到公历必须用返回中的[yi, mi, dz, ry]
+			'gz':'', //干支纪年(以正月初一为界)
+			'days':0 //该农历月份有多少天
 		};
 		var jdx = this.Jdays(yy, mm, dd, 12, 0, 0); //求出指定年月日之JD值
 		
-		//-721年至-104年的后九月及月建问题,与朔有关,与气无关,这段时期不支持逆转到公历
-		if (yy >= -721 && yy <= -104) { //这一段来自寿星万年历,十九年七闰法：7个闰年均匀安插在19个年整数中,闰年的末月置为闰月。
+		//-721年至-104年的后九月及月建问题,与朔有关,与气无关.不同历法交汇,导致某些农历日期会对应到多个公历,所以这段时期不支持逆转到公历.如 -221-9-1 与 -221-10-31 的农历都是-221年十月初一
+		if (jdx >= 1457698 && jdx <= 1683430) { //这一段来自寿星万年历,十九年七闰法:7个闰年均匀安插在19个年整数中,闰年的末月置为闰月
 			var yi = 0; //定农历年份
 			var mi = 0; //农历月份从1开始
 			var dz = 0; //农历日期从1开始
-			var ry = 0; //是否闰月,只有闰九和闰十二
+			var ry = false; //是否闰月,只有闰九和闰十二
 			var ii = 0; //该公历日期在第几轮循环中
 			var ns = []; //年首相关信息,NianShou
 			for (var i = 0,step = 3; i <= step; i++) { //计算连续的正月初一,对应的农历日期必定在此范围内
+				var jd = 0;
 				var YY = yy + i - 1; //可能所在的农历年份
 				if (YY >= -220) { //秦汉历,19年7闰,年首为十月,mi=4为正月,闰年的末月置闰并取名"后九"月,1640641为历法生效时间公历-221.10.31
-					var jd = 1640641 + Math.floor(0.866 + (YY + 220) * 12.369000) * this.synmonth; //颁行历年首
+					jd = 1640641 + Math.floor(0.866 + (YY + 220) * 12.369000) * this.synmonth; //颁行历年首
 					ns[i + 6] = '后九'; //闰月名称
 					ns[i + 11] = 10; //表示第10个月置闰
 				}else if (YY >= -479) { //战国历,19年7闰,年首为正月,闰年的末月置闰并取名闰"十三",1546083为历法生效时间公历-480.12.11
-					var jd = 1546083 + Math.floor(0.500 + (YY + 479) * 12.368422) * this.synmonth;
+					jd = 1546083 + Math.floor(0.500 + (YY + 479) * 12.368422) * this.synmonth;
 					ns[i + 6] = '十三';
 					ns[i + 11] = 13; //表示第13个月置闰
 				}else if (YY >= -722) { //春秋历,19年7闰,年首为正月,闰年的末月置闰并取名闰"十三",1457698为历法生效时间公历-722.12.17
-					var jd = 1457698 + Math.floor(0.342 + (YY + 721) * 12.368422) * this.synmonth;
+					jd = 1457698 + Math.floor(0.342 + (YY + 721) * 12.368422) * this.synmonth;
 					ns[i + 6] = '十三';
 					ns[i + 11] = 13;
 				}
+				if(jd < 1457698){
+					continue;
+				}
 				ns[i] = this.TrueNewMoon(jd, true);
+				ns[i] = Math.floor(ns[i] + 0.5); //确保统一成整数
 				if(jdx > ns[i]){
 					continue;
 				}
@@ -2080,10 +2131,10 @@ function paipan() {
 				yi = (jdx == ns[i]) ? YY : (YY - 1);
 				step = ii + 1; //多算一个年初一以确定本年有多少个月
 			}
-			
 			var tjd = [];
 			for(var j = 0; j < 14; j++){ //逐步算出朔望日,得到闰月日期等
 				var jd = (j == 0) ? ns[ii] : this.TrueNewMoon(tjd[j - 1] + this.synmonth + 14, true); //以jd值代入求瞬時朔望日
+				jd = Math.floor(jd + 0.5); //确保统一成整数
 				if(mi + dz == 0){ //还没找到过
 					if(jdx == jd){ //正好是这个月初一
 						mi = j + 1;
@@ -2094,22 +2145,26 @@ function paipan() {
 						dz = jdx - tjd[j - 1] + 1;
 					}
 				}
+				tjd[j] = jd; //最后一个是下一年年初一的,用于计算每个月多少天
 				if(jd >= ns[ii + 1]){ //下一年的年初一
 					break;
 				}
-				tjd[j] = jd;
 			}
 			ob.yi = yi;
 			ob.ym = this.dxy[(mi + ns[ii + 11] - 2)%12];
+			ob.days = tjd[mi] - tjd[mi-1]; //该月多少天
+
 			if(mi <= 12 - ns[ii + 11] + 1){ //正月之前算上一年
 				ob.yi--;
 			}
-			if(tjd.length == 13){ //该年有闰月
+			if(tjd.length == 14){ //该年有闰月
 				if(mi == 13){ //都是最后一个月置闰
 					ry = true;
-					ob.ym = ns[ii + 6];
+					ob.ym = ns[ii + 6]; //非常规,可能史书上称后九或十三
 				}
 			}
+			
+			ob.gz = this.gz[((ob.yi + 4712 + 24) % 60 + 60) % 60]; //干支纪年
 			
 			return [yi, mi, dz, ry, ob];
 		}
@@ -2126,6 +2181,8 @@ function paipan() {
             }
         }
         var dz = Math.floor(jdx) - Math.floor(sjd[mi] + 0.5) + 1; //此處加1是因為每月初一從1開始而非從0開始
+		var dn = Math.floor(sjd[mi + 1] + 0.5) - Math.floor(sjd[mi] + 0.5); //该月多少天
+		
         if (mc[mi] < 2 || flag == 1) {
             var yi = yy - 1;
         } else {
@@ -2140,7 +2197,9 @@ function paipan() {
         var mi = (Math.floor(mc[mi] + 10) % 12) + 1; //對應到月份
 
 		ob.yi = yi;
-		ob.ym = this.dxy[mi - 1]; //月建对应的默认月名称：建子十一,建丑十二,建寅为正……
+		ob.days = dn;
+		ob.ym = this.dxy[mi - 1]; //月建对应的默认月名称:建子十一,建丑十二,建寅为正...
+		
 		var Dm = jdx - dz + 1; //这个月的初一儒略日
 		if (Dm >= 1724360 && Dm <= 1729794) { //8.01.15至 23.12.02 建子为十二,其它顺推.这个1724360是9.01.15,不知道是不是寿星笔误
 			ob.ym = this.dxy[mi%12];
@@ -2157,7 +2216,7 @@ function paipan() {
 			if(mi == 11 || mi == 12){ //正月腊月算到下一年
 				ob.yi++;
 			}
-		} else if (Dm >= 1973067 && Dm <= 1977052) { //689.12.18至700.11.15 建子为正月,建寅为一月,其它不变.一整年变为: 正月,腊月,一月,二月,三月....
+		} else if (Dm >= 1973067 && Dm <= 1977052) { //689.12.18至700.11.15 建子为正月,建寅为一月,其它不变.一整年变为: 正月,腊月,一月,二月,三月...
 			if (mi == 11) {
 				ob.ym = "正";
 			}
@@ -2171,14 +2230,17 @@ function paipan() {
 		if (Dm == 1729794 || Dm == 1808699) {
 			ob.ym = '拾贰'; //239.12.13及23.12.02均为十二月,为避免两个连续十二月，此处改名
 		}
+		
+		ob.gz = this.gz[((ob.yi + 4712 + 24) % 60 + 60) % 60]; //干支纪年
+		
         return [yi, mi, dz, ry, ob];
     };
     /**
-     * 计算公历的某天是星期几(PHP中的date方法,此处演示儒略日历的转换作用)
-     * @param int yy
-     * @param int mm
-     * @param int dd
-     * @return false/int wkd[i]
+     * 计算公历的某天是星期几(PHP中的date方法,此处演示儒略日历的转换作用) this.wkd[i]
+     * @param int yy(-1000-3000)
+     * @param int mm(1-12)
+     * @param int dd(1-31)
+     * @return false/int
      */
     this.GetWeek = function(yy, mm, dd) {
         var yy = this.intval(yy);
@@ -2194,8 +2256,8 @@ function paipan() {
     };
     /**
      * 获取公历某个月有多少天
-     * @param int yy
-     * @param int mm
+     * @param int yy(-1000-3000)
+     * @param int mm(1-12)
      * @return number
      */
     this.GetSolarDays = function(yy, mm) {
@@ -2203,7 +2265,6 @@ function paipan() {
         var mm = this.intval(mm);
 
         if (mm < 1 || mm > 12) { //月份超出範圍
-            this.logs(13);
             return 0;
         }
         if (yy == 1582 && mm == 10) { //这年这个月的5到14日不存在,所以1582年10月只有21天
@@ -2216,8 +2277,8 @@ function paipan() {
     };
 	/**
      * 获取农历某个月有多少天
-     * @param int yy
-     * @param int mm
+     * @param int yy(-1000-3000)
+     * @param int mm(1-12)
      * @param bool ry 是否闰月
      * @return number
      */
@@ -2236,7 +2297,7 @@ function paipan() {
     };
     /**
      * 获取农历某年的闰月,0为无闰月
-     * @param int yy
+     * @param int yy(-1000-3000)
      * @return number
      */
     this.GetLeap = function (yy){
@@ -2250,14 +2311,14 @@ function paipan() {
         return ob['leap'];
     };
     /**
-     * 根据公历年月日精确计算星座下标
-     * @param int yy
-     * @param int mm
-     * @param int dd
-     * @param int hh 时间(0-23)
-     * @param int mt 分钟数(0-59)
-     * @param int ss 秒数(0-59)
-     * @return int|false this.cxz[xz]
+     * 根据公历年月日精确计算星座下标 this.cxz[xz]
+     * @param int yy(-1000-3000)
+     * @param int mm(1-12)
+     * @param int dd(1-31)
+     * @param int hh(0-23)
+     * @param int mt(0-59),分钟
+     * @param int ss(0-59),秒数
+     * @return int|false
      */
 	this.GetXZ = function(yy, mm, dd, hh, mt, ss) {
         var yy = this.intval(yy);
@@ -2291,13 +2352,13 @@ function paipan() {
         return xz;
     };
     /**
-     * 四柱計算,分早子时晚子时,传公历
-     * @param int yy
-     * @param int mm [1-12]
-     * @param int dd
-     * @param int hh
-     * @param int mt 分钟数(0-59),在跨节的时辰上会需要,有的排盘忽略跨节
-     * @param int ss 秒数(0-59)
+     * 四柱計算,根据this.zwz决定是否分早子时晚子时,传公历
+     * @param int yy(-1000-3000)
+     * @param int mm(1-12)
+     * @param int dd(1-31)
+     * @param int hh(0-23)
+     * @param int mt(0-59),分钟,在跨节的时辰上会需要,有的排盘忽略跨节
+     * @param int ss(0-59),秒数
      * @return false/array(天干, 地支, 附加资料)
      */
     this.GetGZ = function(yy, mm, dd, hh, mt, ss) {
@@ -2372,7 +2433,7 @@ function paipan() {
     };
     /**
      * 根据年干支计算所有合法的月干支
-     * @param int ygz 年柱干支代码
+     * @param int ygz(0-59) 年柱干支代码
      * @return array 月柱干支代码列表
      */
     this.MGZ = function(ygz) {
@@ -2391,7 +2452,7 @@ function paipan() {
     };
     /**
      * 根据日干支计算所有合法的时干支
-     * @param int dgz 日柱干支代码
+     * @param int dgz(0-59) 日柱干支代码
      * @return array 时柱干支代码列表
      */
     this.HGZ = function(dgz) {
@@ -2410,37 +2471,34 @@ function paipan() {
     };
     /**
      * 根据一柱天干地支代码计算该柱的六十甲子代码
-     * @param int tg 天干代码
-     * @param int dz 地支代码
+     * @param int tg(0-9) 天干代码
+     * @param int dz(0-11) 地支代码
      * @return false/int 干支代码
      */
     this.GZ = function(tg, dz) {
         var tg = this.intval(tg);
         var dz = this.intval(dz);
 
-        if (tg < 0 || tg > 59) {
-            this.logs(3, 11);
+        if (tg < 0 || tg > 9) {
             return false;
         }
 
-        if (dz < 0 || dz > 59) {
-            this.logs(3, 12);
+        if (dz < 0 || dz > 11) {
             return false;
         }
 
         if ((tg % 2) != (dz % 2)) { //偶数对偶数,奇数对奇数才能组成一柱
-            this.logs(3, 13);
             return false;
         }
         return ((10 + tg - dz) % 10) / 2 * 12 + dz;
     };
     /**
      * 根据八字干支查找对应的公历日期(GanZhi To GongLi)
-     * @param int ygz
-     * @param int mgz
-     * @param int dgz
-     * @param int hgz
-     * @param int yeai 起始年 year initial
+     * @param int ygz(0-59) 对应的是this.gz
+     * @param int mgz(0-59)
+     * @param int dgz(0-59)
+     * @param int hgz(0-59)
+     * @param int yeai(-1000-3000) 起始年 year initial
      * @param int mx 查找多少个甲子
      */
     this.gz2gl = function(ygz, mgz, dgz, hgz, yeai, mx) {
@@ -2452,28 +2510,22 @@ function paipan() {
         var mx = this.intval(mx);
 
         if (ygz < 0 || ygz >= 60) { //年干支非六十甲子
-            this.logs(3, 0);
             return false;
         }
         if (mgz < 0 || mgz >= 60) { //月干支非六十甲子
-            this.logs(3, 1);
             return false;
         }
         if (dgz < 0 || dgz >= 60) { //日干支非六十甲子
-            this.logs(3, 2);
             return false;
         }
         if (hgz < 0 || hgz >= 60) { //时干支非六十甲子
-            this.logs(3, 3);
             return false;
         }
 
         if (!(mgz in this.MGZ(ygz))) { //对应的月干支不存在
-            this.logs(2, 0);
             return false;
         }
         if (!(hgz in this.HGZ(dgz))) { //对应的时干支不存在
-            this.logs(2, 1);
             return false;
         }
 		var hgzs = this.HGZ(dgz); //该日下所有时柱
@@ -2481,10 +2533,6 @@ function paipan() {
 			dgz = (dgz + 1) % 60;
 		}
         var yeaf = yeai + mx * 60;
-
-        if (yeai < -1000 || yeaf > 3000) { //說明大誤差區域:適用於西元-1000年至西元3000年,超出此範圍誤差較大
-            this.logs(1);
-        }
 
         var ifs = []; //initial-final 返回一个含起止时间的数组
 
@@ -2503,13 +2551,13 @@ function paipan() {
 				var dj = this.GetAdjustedJQ(ty, false);
 				jdpjq = jdpjq.concat(dj);
 			}
-            var ijd = jdpjq[21 + 2*mgzo]; // 節氣月頭JD initial jd 21立春
-            var fjd = jdpjq[21 + 2*mgzo + 2]; // 節氣月尾JD final jd
+            var ijd = jdpjq[21 + 2*mgzo]; //節氣月頭JD initial jd 21立春
+            var fjd = jdpjq[21 + 2*mgzo + 2]; //節氣月尾JD final jd
 
-            var sdc = (Math.floor(ijd) + 49) % 60; // 節氣月頭的日干支代碼,儒略日历时间0日为癸丑日,六十甲子代码为49
-            var asdc = (dgz + 60 - sdc) % 60; // 生日相對於節氣月頭的日數
-            var idd = Math.floor(ijd + asdc); // 生日JD值(未加上時辰)
-            var ihh = hgz % 12; // 時辰代碼
+            var sdc = (Math.floor(ijd) + 49) % 60; //節氣月頭的日干支代碼,儒略日历时间0日为癸丑日,六十甲子代码为49
+            var asdc = (dgz + 60 - sdc) % 60; //生日相對於節氣月頭的日數
+            var idd = Math.floor(ijd + asdc); //生日JD值(未加上時辰)
+            var ihh = hgz % 12; //時辰代碼
             var id = idd + (ihh * 2 - 13) / 24;
             var fd = idd + (ihh * 2 - 11) / 24;
 
@@ -2536,7 +2584,7 @@ function paipan() {
     /**
      * 根据公历年月日计算命盘信息 fate:命运 map:图示
      * @param int xb 性别0男1女
-     * @param int yy 年份.确保传的是this.J对应的时间
+     * @param int yy 年份(-1000-3000).确保传的是this.J对应的时间
      * @param int mm 月份(1-12)
      * @param int dd 日期(1-31)
      * @param int hh 时间(0-23)
@@ -2554,11 +2602,6 @@ function paipan() {
         var hh = this.intval(hh);
         var mt = (mt === undefined) ? 0 : this.intval(mt);
         var ss = (ss === undefined) ? 0 : this.intval(ss);
-		
-        //說明大誤差區域
-        if (yy < -1000 || yy > 3000) { //適用於西元-1000年至西元3000年,超出此範圍誤差較大
-            this.logs(1);
-        }
 
         var spcjd = this.Jdays(yy, mm, dd, hh, mt, ss); //special jd,这里依然是标准时间,即this.J处的平太阳时
         if (spcjd === false) {
@@ -2568,7 +2611,7 @@ function paipan() {
 		var rt = []; //要返回的数组 return
 		
 		if(J !== undefined){ //有传参,需要转地方真太阳时
-			rt['pty'] = spcjd + (this.floatval(J) - this.J) * 4 * 60 / 86400; //计算地方平太阳时,每经度时差4分钟
+			rt['pty'] = spcjd - (this.J - this.floatval(J)) * 4 / 60 / 24; //计算地方平太阳时,每经度时差4分钟
 			rt['pty'] = this.Jtime(rt['pty']); //地方平太阳时
 
 			spcjd = this.zty(spcjd, J, W); //采用真太阳时排盘,这里有点疑问: 对应的廿四节气的计算是否也要转为真太阳时呢?
@@ -2577,7 +2620,6 @@ function paipan() {
 		
         var [yy, mm, dd, hh, mt, ss] = this.Jtime(spcjd); //假设hh传了>24的数字,此处修正
 
-        var ta = 365.24244475; //一個廻歸年的天數
         var nwx = [0, 0, 0, 0, 0]; //五行数量 number of WuXing 这里不计算藏干里的
         var nyy = [0, 0]; //阴阳数量 number of YinYang 这里不计算藏干里的
 
@@ -2647,15 +2689,24 @@ function paipan() {
                 break;
             } //ord即為指定時刻所在的節氣月首JD值
         }
+		
+		var ta = this.pdy ? 365.24244475 : 360; //一個廻歸年的天數
+		
         var xf = spcjd - ob.jr[21 + 2*ord]; //xf代表節氣月的前段長,單位為日,以指定時刻為分界點
         var yf = ob.jr[21 + 2*ord + 2] - spcjd; //yf代表節氣月的後段長
         if (((xb == 0) && (yytg[0] == 0)) || ((xb == 1) && (yytg[0] == 1))) {
-            var zf = ta * 10 * (yf / (yf + xf)); //zf為指定日開始到起運日之間的總日數(精確法)
-            //zf = 360 * 10 * (yf / 30); //zf為指定日開始到起運日之間的總日數(粗略法）三天折合一年,一天折合四个月,一个时辰折合十天,一个小时折合五天,反推得到一年按360天算,一个月按30天算
+			if(this.pdy){
+				var zf = ta * 10 * (yf / (yf + xf)); //zf為指定日開始到起運日之間的總日數(精確法)
+			}else{
+				var zf = ta * 10 * (yf / 30); //zf為指定日開始到起運日之間的總日數(粗略法）三天折合一年,一天折合四个月,一个时辰折合十天,一个小时折合五天,反推得到一年按360天算,一个月按30天算
+			}
             var forward = 0; //陽年男或陰年女,其大運是順推的
         } else {
-            var zf = ta * 10 * (xf / (yf + xf)); //陰年男或陽年女,其大運是逆推的
-            //zf = 360 * 10 * (xf / 30); //(粗略法)
+			if(this.pdy){
+				var zf = ta * 10 * (xf / (yf + xf)); //陰年男或陽年女,其大運是逆推的
+			}else{
+				var zf = ta * 10 * (xf / 30); //(粗略法)
+			}
             var forward = 1;
         }
         var qyt = spcjd + zf; //起運時刻為指定時刻加上推算出的10年內比例值zf
