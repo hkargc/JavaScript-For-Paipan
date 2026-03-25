@@ -5,6 +5,13 @@ PHP JavaScript 农历公历干支历互转,万年历,四柱,六十甲子,属相,
 
 算法原理和JS源码完全来自: http://www.bieyu.com/<br />
 结果比对及农历修正来自寿星万年历: http://www.nongli.net/sxwnl/<br />
+计算真太阳时所需要的经纬坐标数据: https://github.com/xiangyuecn/AreaCity-JsSpider-StatsGov<br />
+
+本项目所做的工作:<br />
+a,整理 http://www.bieyu.com/ 的JavaScript源码,改编真太阳时算法,引入刑冲合害的计算<br />
+b,把 http://www.nongli.net/sxwnl/ 寿星万年历的农历模块搬过来,涉及节气和朔望月修正<br />
+c,比对上述两个项目的运算结果,确认误差在可接受范围内<br />
+d,把JavaScript完整地转成PHP实现<br />
 
 演示地址: https://hkargc.github.io/paipan/ <br />
 
@@ -51,6 +58,7 @@ PHP JavaScript 农历公历干支历互转,万年历,四柱,六十甲子,属相,
 公历儒略历部分完全匹配<br />
 节气及月相部分相差不超过20秒(均为天文科学上的算法)<br />
 真太阳时部分相差在20秒内,本项目考虑了纬度(均为天文科学上的算法)<br />
+PHP中的date_sun_info($timestamp, $W, $J)也能实现真太阳时的计算,与本项目的真太阳时模块有几分钟误差<br />
 农历-721年至2300年完全匹配(古代农历是完全从寿星万年历搬过来的)<br />
 四柱八字算法上,寿星不考虑年柱月柱的真太阳时,导致少量对不上<br />
 星座算法上,寿星精确到日,本项目精确到秒,导致节气交接日星座对不上<br />

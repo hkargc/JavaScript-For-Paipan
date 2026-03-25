@@ -8,9 +8,9 @@
 if(top != self){  
 	top.location.href = self.location.href;  
 }
-document.write("<script src='./js/jquery-3.6.0.min.js'><\/script>");
-document.write("<script src='./js/JW.js?v="+Math.random()+"'><\/script>"); //全国经度数据,来源于寿星万年历
-document.write("<script src='./js/infinity.js?v="+Math.random()+"'><\/script>"); //无限级选择
+document.write("<script src='./js/jquery-4.0.0.min.js'><\/script>");
+document.write("<script src='./js/JW.js?v="+Math.random()+"'><\/script>"); //全国经度数据,来源: https://github.com/xiangyuecn/AreaCity-JsSpider-StatsGov
+document.write("<script src='./js/selectmenu.js?_="+Math.random()+"'><\/script>"); //手搓的简易下拉菜单
 
 document.write("<script src='./js/paipan.js?v="+Math.random()+"'><\/script>");
 <!-- document.write("<script src='./js/paipan.min.js?v="+Math.random()+"'><\/script>"); -->
@@ -57,7 +57,7 @@ tgdz[1] = '地支';
 
 function chg(){
 
-	var id = inf.get();
+	var id = menu.get();
 	if((id == 0) || (JW[id] == undefined) || (JW[id][3] == undefined)){
 		$('#text').val("请选择城市!");
 		$("#jw").html("");
@@ -92,7 +92,7 @@ function chg(){
 	
 	var jq = p.GetAdjustedJQ(yy - 1, false);
 	var days = now - Math.floor(jq[18] + 0.5); //距离冬至的天数
-	if((days >= 0) && (days <= 81)){ //冬至
+	if((days >= 0) && (days < 81)){ //冬至
 		txt += p.dxs[(parseInt(days / 9) + 1)] + "九第" + ((days % 9) + 1) + "天\n";
 	}
 
@@ -170,7 +170,8 @@ function chg(){
 	var [utrise, utset, dt, trise, tset] = p.risenset(jd, J, W, 2);
 	var t1 = (trise === false) ? ['-','-','-','-','-','-'] : p.Jtime(trise);
 	var t2 = (tset === false) ? ['-','-','-','-','-','-'] : p.Jtime(tset);
-	txt += "太阳升起:"+t1[3]+"时"+t1[4]+"分"+t1[5]+"秒\t"+"降落:"+t2[3]+"时"+t2[4]+"分"+t2[5]+"秒\n";
+	var t3 = p.Jtime((tset - trise)/2 + trise);
+	txt += "太阳升起:"+t1[3]+"时"+t1[4]+"分"+t1[5]+"秒\t"+"降落:"+t2[3]+"时"+t2[4]+"分"+t2[5]+"秒\t"+"正午:"+t3[3]+"时"+t3[4]+"分"+t3[5]+"秒\n";
 	
 	var [utrise, utset] = p.risenset(jd, J, W, 3); //注意这里的dt来源
 	var t1 = (utrise === false) ? ['-','-','-','-','-','-'] : p.Jtime(utrise - dt + (p.J - J) * 4 / 60 / 24);
@@ -264,8 +265,8 @@ $(function(){
 	$("#mt").val(d.getMinutes());
 	$("#ss").val(d.getSeconds());
 	
-	inf = new infinity();
-	inf.init('city', JW, 427, chg);
+	window.menu = new selectmenu();
+	menu.init($('#city'), JW, 432, chg, {force:true});
 		
 	chg();
 });
